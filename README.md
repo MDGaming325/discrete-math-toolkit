@@ -10,7 +10,7 @@ This repository aims to offer solutions for:
   
 - **Diophantine Equations:** Tools for solving Diophantine equations with(out) restrictions.
 
-- **Modular Arithmetic:** Functions for performing arithmetic operations in modular arithmetic and the applied use in Criptography like RSA.
+- **Modular Arithmetic:** Functions for performing arithmetic operations in modular arithmetic, along with practical applications, such as its use in Cryptography, exemplified by algorithms like RSA.
 
 - **Combinatory:** Solutions related to combinatorics, permutations, and combinations.
 
