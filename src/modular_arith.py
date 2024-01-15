@@ -1,8 +1,9 @@
 from typing import NamedTuple, Tuple, List
-from integer_arith import EuclideanDivision
+from integer_arith import EuclideanDivision, fast_check_prime
 from math import gcd
 
 CongruenceEquation = NamedTuple('CongruenceEquation', [('coefficient_x', int), ('remainder', int), ('mod', int)])
+CRTSolution = NamedTuple('CRTSolution', [('coefficient_k', int), ('remainder', int)])
 
 def inverse_igneous(n: int, m: int) -> int:
     """
@@ -48,3 +49,29 @@ def normalize_equation(equation: CongruenceEquation) -> CongruenceEquation:
     else:
         raise ValueError('Inverse of the x coefficient in Zn does not exist')
     
+def CRT_solve_special_case(equations: List[CongruenceEquation]) -> CRTSolution:
+
+    """
+    The CRT_solve_special_case function takes a list of congruence equations and returns the solution to the system.
+        The function first finds N, which is equal to all of the moduli multiplied together. Then it uses this value 
+        along with each equation's remainder and modulus in order to find x_0, which is then returned as part of a CRTSolution object.
+
+    :param equations: List[CongruenceEquation]: Store the list of congruence equations
+    :return: A CRTSolution object
+    """
+
+    N = 1
+    rem = 0
+
+    for eq in equations:
+        N = N * eq.mod
+
+    for eq in equations:
+
+        b = eq.remainder
+        c = N//eq.mod
+        d = inverse_igneous(c,eq.mod)
+
+        rem += b*c*d
+
+    return CRTSolution(N, rem%N)
