@@ -1,14 +1,13 @@
-import sys
-sys.path.append('src')
-from recursion import *
+import unittest
+from src.recursion import *
+
+class TestRecursion(unittest.TestCase):
+
+    def test_grade(self):
+        recursion = HomogenousRecursion((1,2,3),[RecursionCase(0,0)])
+        grade = recursion.grade()
+        self.assertEqual(grade,2)
 
 
-
-x = HomogenousRecursion(
-    (1,4),[RecursionCase(0,0), RecursionCase(1,1)]
-)
-
-print(x.coefficients)
-print(x.cases[0])
-print(x.grade())
-print(x.solve_for_n(3))
+if __name__ == '__main__':
+    unittest.main()
