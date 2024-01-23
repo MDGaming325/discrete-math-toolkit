@@ -1,5 +1,8 @@
+# Cache
 src/__pycache__/
 tests/__pycache__
 .pytest_cache
+
+#Other
 .vscode
-.benchmark
+.benchmarks
