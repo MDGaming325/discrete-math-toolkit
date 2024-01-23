@@ -1,10 +1,10 @@
 from typing import *
 from math import sqrt
 
-'''Please note that we define recursions like as the example given: Aa(n) = Ba(n-1) + Ca(n-2),
+'''Please note that we define recursions like as the example given: Aa(n) = Ba(n-1) + Ca(n-2) + f(n),
     where A,B,C are coefficients.'''
 
-RecursionCase = NamedTuple('Case', [('index', int), ('value', int)])
+Case = NamedTuple('Case', [('index', int), ('value', int)])
 
 RecursionSolution = NamedTuple('RecursionSolution', [('grade', int),
                                                      ('double_root', Union[bool,None]),
@@ -15,7 +15,7 @@ RecursionSolution = NamedTuple('RecursionSolution', [('grade', int),
 
 class HomogenousRecursion:
 
-    def __init__(self, coefficients:Tuple[int,int,Optional[int]], cases:List[RecursionCase]) -> None: 
+    def __init__(self, coefficients:Tuple[int,int,Optional[int]], cases:List[Case]) -> None: 
         self.coefficients = coefficients
         self.cases = cases
 
@@ -38,10 +38,10 @@ class HomogenousRecursion:
             return RecursionSolution(1,None,coefficient,root,None,None)
         else:
 
-            discriminant = sqrt(self.coefficients[1]**2-4*self.coefficients[0]*(-self.coefficients[2]))
+            discriminant = sqrt(self.coefficients[1]**2 -4*self.coefficients[0]*(-self.coefficients[2]))
     
-            r0 = (self.coefficients[1] + discriminant)/2*self.coefficients[0]     
-            r1 = (self.coefficients[1] - discriminant)/2*self.coefficients[0]
+            r0 = (-(-self.coefficients[1]) + discriminant)/2*self.coefficients[0]     
+            r1 = (-(-self.coefficients[1]) - discriminant)/2*self.coefficients[0]
 
             if r0 == r1:
                 C = self.cases[0].value
@@ -69,4 +69,3 @@ class HomogenousRecursion:
             else:
                 return solution.coefficient0*solution.root0**n+solution.coefficient1*solution.root1**n
             
-
