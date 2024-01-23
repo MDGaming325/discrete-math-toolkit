@@ -1,3 +1,5 @@
 src/__pycache__/
-src/pruebas.py
+tests/__pycache__
+.pytest_cache
 .vscode
+.benchmark
