@@ -1,7 +1,48 @@
-from typing import NamedTuple, Tuple, List
+from typing import DefaultDict, NamedTuple, Tuple, List
 from math import sqrt, floor
 
 EuclideanDivision = NamedTuple('EuclideanDivision', [('dividend', int), ('divisor', int), ('quotient', int), ('remainder', int)])
+
+def sieve_of_eratosthenes(n:int) -> List[int]:
+    
+    primes = [2]
+    not_primes = list()
+    candidates = list(range(3,n+1,2))
+
+    for candidate in candidates:
+        for elem in primes:
+            if candidate % elem == 0:
+                not_primes.append(candidate)
+
+        if candidate not in not_primes:
+            primes.append(candidate)
+
+    return primes
+
+
+def lineal_factorization(n:int) -> List[Tuple[int,int]]:
+
+    brk = True
+    quotient = None
+    res = DefaultDict(int)
+    floor_sqrt_n = floor(sqrt(n))
+    primes_to_check = sieve_of_eratosthenes(floor_sqrt_n)
+
+    while quotient != 1 and brk:
+            for prime in primes_to_check:
+
+                if n%prime == 0:
+                    while n%prime == 0 and (quotient == None or prime < sqrt(quotient)):
+                        res[prime] += 1
+                        quotient = n//prime
+                        n = quotient
+
+                elif prime == primes_to_check[-1]:
+                    res[quotient] += 1
+                    brk = False
+                    break
+
+    return list(res.items())    
 
 
 def fast_check_prime(n:int) -> bool:
@@ -18,13 +59,16 @@ def fast_check_prime(n:int) -> bool:
         k0 = (n-1)/6
         k1 = (n+1)/6
 
-        if k0 == int(k0) or k1 == int(k1):
+        if float(k0).is_integer() != float(k1).is_integer():
             return True
         else:
             return False
         
     else:
         raise ValueError('Candidate n must be >5')
+
+
+
 
 def euclidean_algorithm(a: int, b: int) -> List[EuclideanDivision]:
     """
