@@ -1,28 +1,19 @@
-import sys
-from typing import NamedTuple, Tuple, List 
+from pytest import approx
+from src.modular_arith import *
 
-sys.path.append('src')
-import modular_arith as modarith
+special_case = [CongruenceEquation(1, 22, 2),
+                CongruenceEquation(1, 7, 3),
+                CongruenceEquation(1, 160, 5)]
 
-def test_CRT_solve_special_case(equations: List[modarith.CongruenceEquation]):
-    """
-    The test_CRT_solve_special_case function tests the CRT_solve_special_case function.
-        It takes a list of congruence equations as input and prints out the solution to those equations.
+def test_inverse_igneous():
+    inverse = inverse_igneous(12123,5)
+    assert inverse == 2
 
+def test_normalize_equation():
+    normalized = normalize_equation(CongruenceEquation(2,5,3))
+    assert normalized == CongruenceEquation(1,1,3)
 
-    :param equations: List[CongruenceEquation]: Pass a list of congruence equations to the function
-    :return: The solution of the congruence equations
-    """
+def test_CRT_solve_special_case():
 
-    x = modarith.CRT_solve_special_case(equations)
-
-    print('='*50)
-    print('Test of the function CRT_solve_special_case')
-    print(x)
-
-if __name__ == '__main__':
-    test_CRT_solve_special_case(
-        [modarith.CongruenceEquation(1,22,2),
-        modarith.CongruenceEquation(1,7,3),
-        modarith.CongruenceEquation(1,160,5)]
-    )
+    solution = CRT_solve_special_case(special_case)
+    assert solution == CRTSolution(30, 10)
