@@ -1,13 +1,17 @@
 from typing import DefaultDict, NamedTuple, Tuple, List
 from math import sqrt, floor
+import random
 
-EuclideanDivision = NamedTuple('EuclideanDivision', [('dividend', int), ('divisor', int), ('quotient', int), ('remainder', int)])
+EuclideanDivision = NamedTuple('EuclideanDivision', [(
+    'dividend', int), ('divisor', int), ('quotient', int), ('remainder', int)])
+MRForm = NamedTuple('MRForm', [('s', int), ('r', int)])
 
-def sieve_of_eratosthenes(n:int) -> List[int]:
-    
+
+def sieve_of_eratosthenes(n: int) -> List[int]:
+
     primes = [2]
     not_primes = list()
-    candidates = list(range(3,n+1,2))
+    candidates = list(range(3, n+1, 2))
 
     for candidate in candidates:
         for elem in primes:
@@ -20,7 +24,33 @@ def sieve_of_eratosthenes(n:int) -> List[int]:
     return primes
 
 
-def lineal_factorization(n:int) -> List[Tuple[int,int]]:
+def modular_power(b: int, e: int, n: int) -> int:
+    res = 1
+    exp_bin = bin(e)[2:]
+    ins = [exp_bin[0]]
+
+    for e in exp_bin[1:]:
+        ins.append('C')
+        ins.append(e)
+
+    for char in ins:
+        if char == '1':
+            res = (res*b) % n
+        elif char == 'C':
+            res = (res**2) % n
+
+    return res
+
+
+def fermat_primality(n: int, confidence: int) -> bool:
+    for _ in range(confidence):
+        b = random.randint(2, n-1)
+        if modular_power(b, n, n) != b % n:
+            return False
+    return True
+
+
+def lineal_factorization(n: int) -> List[Tuple[int, int]]:
 
     brk = True
     quotient = None
@@ -29,45 +59,20 @@ def lineal_factorization(n:int) -> List[Tuple[int,int]]:
     primes_to_check = sieve_of_eratosthenes(floor_sqrt_n)
 
     while quotient != 1 and brk:
-            for prime in primes_to_check:
+        for prime in primes_to_check:
 
-                if n%prime == 0:
-                    while n%prime == 0 and (quotient == None or prime < sqrt(quotient)):
-                        res[prime] += 1
-                        quotient = n//prime
-                        n = quotient
+            if n % prime == 0:
+                while n % prime == 0 and (quotient == None or prime < sqrt(quotient)):
+                    res[prime] += 1
+                    quotient = n//prime
+                    n = quotient
 
-                elif prime == primes_to_check[-1]:
-                    res[quotient] += 1
-                    brk = False
-                    break
+            elif prime == primes_to_check[-1]:
+                res[quotient] += 1
+                brk = False
+                break
 
-    return list(res.items())    
-
-
-def fast_check_prime(n:int) -> bool:
-    """
-    The fast_check_prime function is a fast way to check if a number is prime.
-    It works by checking if the number can be expressed as 6k +/- 1, where k is an integer.
-    If it can, then it returns True; otherwise False.
-    
-    :param n:int: Specify the input type of n, and the -&gt; bool parameter is used to specify that this function returns a boolean value
-    :return: True or false
-    """
-    
-    if n > 5:
-        k0 = (n-1)/6
-        k1 = (n+1)/6
-
-        if float(k0).is_integer() != float(k1).is_integer():
-            return True
-        else:
-            return False
-        
-    else:
-        raise ValueError('Candidate n must be >5')
-
-
+    return list(res.items())
 
 
 def euclidean_algorithm(a: int, b: int) -> List[EuclideanDivision]:
@@ -75,19 +80,18 @@ def euclidean_algorithm(a: int, b: int) -> List[EuclideanDivision]:
     The euclidean_algorithm function takes two positive integers, a and b, as input.
     It returns the list of EuclideanDivision objects that represent the steps in 
     the Euclidean algorithm for finding the greatest common divisor of a and b.
-    
-    
+
+
     :param a: int: Represent the first number in the euclidean algorithm
     :param b: int: Represent the second number in the euclidean algorithm
     :return: A list of EuclideanDivision objects
     """
-    
+
     operations = list()
     remainder = None
 
     # First append
     operations.append(EuclideanDivision(a, b, a // b, a % b))
-
 
     # Loop
     while remainder != 1:
@@ -100,7 +104,8 @@ def euclidean_algorithm(a: int, b: int) -> List[EuclideanDivision]:
 
     return operations
 
-def fermat_factorization(n:int) -> Tuple[int,int]:
+
+def fermat_factorization(n: int) -> Tuple[int, int]:
     """
     The fermat_factorization function takes an integer n as input and returns a tuple of two integers,
     the first being the smaller factor and the second being the larger factor. The function uses Fermat's 
