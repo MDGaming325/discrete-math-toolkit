@@ -1,28 +1,57 @@
-import sys
-from typing import NamedTuple, Tuple, List 
+import pytest
+from src.modular_arith import *
 
-sys.path.append('src')
-import modular_arith as modarith
+special_case = [CongruenceEquation(1, 22, 2),
+                CongruenceEquation(1, 7, 3),
+                CongruenceEquation(1, 160, 5)]
 
-def test_CRT_solve_special_case(equations: List[modarith.CongruenceEquation]):
-    """
-    The test_CRT_solve_special_case function tests the CRT_solve_special_case function.
-        It takes a list of congruence equations as input and prints out the solution to those equations.
+# RSA Tests
+
+bob = RSAKey(7369362041, 5460505879, 21117089390589805177)
+bob_message = RSAMessage(101010)
+bob_message_encrypted = RSAMessage(33457254919621869997)
+
+alice = RSAKey(7369362041, 5460505879, 21117089390589805177)
 
 
-    :param equations: List[CongruenceEquation]: Pass a list of congruence equations to the function
-    :return: The solution of the congruence equations
-    """
+def test_rsa_check_key(benchmark):
+    check = benchmark(bob.check)
+    assert check == True
 
-    x = modarith.CRT_solve_special_case(equations)
 
-    print('='*50)
-    print('Test of the function CRT_solve_special_case')
-    print(x)
+def test_rsa_private_key(benchmark):
+    check = benchmark(bob.private_key)
+    assert check == 39690029651748795673
 
-if __name__ == '__main__':
-    test_CRT_solve_special_case(
-        [modarith.CongruenceEquation(1,22,2),
-        modarith.CongruenceEquation(1,7,3),
-        modarith.CongruenceEquation(1,160,5)]
-    )
+
+def test_crypt(benchmark):
+    res = benchmark(bob_message.encrypt, alice)
+    assert res == 33457254919621869997
+
+
+def test_decrypt(benchmark):
+    res = benchmark(bob_message_encrypted.decrypt, alice)
+    assert res == 101010
+
+# Other
+
+
+def test_inverse_igneous(benchmark):
+    inverse = benchmark(inverse_igneous, 12123, 5)
+    assert inverse == 2
+
+
+def test_normalize_equation(benchmark):
+    normalized = benchmark(normalize_equation, CongruenceEquation(2, 5, 3))
+    assert normalized == CongruenceEquation(1, 1, 3)
+
+
+def test_CRT_solve_special_case(benchmark):
+
+    solution = benchmark(CRT_solve_special_case, special_case)
+    assert solution == CRTSolution(30, 10)
+
+
+def test_inverse_elegant_eea(benchmark):
+    res = benchmark(inverse_elegant_eea, 3, 10)
+    assert res == 7
