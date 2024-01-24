@@ -24,7 +24,45 @@ def test_sieve_of_eratosthenes(benchmark):
                    43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
 
-@pytest.mark.skip
-def test_lineal_factorization(benchmark):
-    res = benchmark(lineal_factorization, 2593808081)
-    assert res
+def test_divp_algorithm(benchmark):
+    res = benchmark(divp_algorithm, 44021)
+    assert res == 44021
+
+
+def test_divp_factorization(benchmark):
+    expected = {2: 6, 3: 1, 643: 1}
+    res = benchmark(divp_factorization, 123456)
+    assert res == expected.items()
+
+
+def test_fermat_factorization(benchmark):
+    expected = {2: 6, 3: 1, 643: 1}
+    res = benchmark(fermat_factorization, 2027651281)
+    assert res == (44021, 46061)
+
+
+def test_fermat_factorization2(benchmark):
+    expected = {2: 6, 3: 1, 643: 1}
+    res = benchmark(fermat_factorization, 64645311)
+    assert res[0]*res[1] == 64645311
+
+
+def test_totient_prime(benchmark):
+    res = benchmark(totient, 46061)
+    assert res == 46060
+
+
+def test_totient_not_prime(benchmark):
+    res = benchmark(totient, 972)
+    assert res == 324
+
+
+@pytest.mark.skip(reason='Depends on DIVP, too slow')
+def test_totient_strong(benchmark):
+    res = benchmark(totient, 73448480092567094497)
+    assert res == 73448480075426676756
+
+
+def test_elegant_eea(benchmark):
+    res = benchmark(elegant_eea, 1492, 1066)
+    assert (res.d, res.alpha, res.beta) == (2, -5, 7)

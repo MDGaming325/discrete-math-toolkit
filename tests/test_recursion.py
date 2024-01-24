@@ -11,28 +11,31 @@ random = HomogenousRecursion((1, -2, 1), [Case(0, 0), Case(1, 1)])
 # Grade Function
 
 
-def test_grade_1():
-    grade = basic_first_grade.grade()
+def test_grade_1(benchmark):
+    grade = benchmark(basic_first_grade.grade)
     assert grade == 1
 
 
-def test_grade_2():
-    grade = fibonacci.grade()
+def test_grade_2(benchmark):
+    grade = benchmark(fibonacci.grade)
     assert grade == 2
 
 # Solve Function
 
 
-def test_solve_grade1():
-    assert basic_first_grade.solve() == RecursionSolution(1, None, 1, 2, None, None)
+def test_solve_grade1(benchmark):
+    res = benchmark(basic_first_grade.solve)
+    assert res == RecursionSolution(1, None, 1, 2, None, None)
 
 
-def test_solve_grade2_double_root():
-    assert double.solve() == RecursionSolution(2, True, 0, 1, 1, None)
+def test_solve_grade2_double_root(benchmark):
+    res = benchmark(double.solve)
+    assert res == RecursionSolution(2, True, 0, 1, 1, None)
 
 
-def test_solve_grade2_different_root():
-    assert fibonacci.solve() == RecursionSolution(
+def test_solve_grade2_different_root(benchmark):
+    res = benchmark(fibonacci.solve)
+    assert res == RecursionSolution(
         grade=2,
         double_root=False,
         coefficient0=approx(1/sqrt(5)),
@@ -43,17 +46,21 @@ def test_solve_grade2_different_root():
 # Solve for n Function
 
 
-def test_solve_for_n_grade1():
-    assert basic_first_grade.solve_for_n(4) == 16
+def test_solve_for_n_grade1(benchmark):
+    res = benchmark(basic_first_grade.solve_for_n, 4)
+    assert res == 16
 
 
-def test_solve_for_n_grade2_double_root():
-    assert double.solve_for_n(3) == 3
+def test_solve_for_n_grade2_double_root(benchmark):
+    res = benchmark(double.solve_for_n, 3)
+    assert res == 3
 
 
-def test_solve_for_n_grade2_different_root():
-    assert fibonacci.solve_for_n(7) == approx(13)
+def test_solve_for_n_grade2_different_root(benchmark):
+    res = benchmark(fibonacci.solve_for_n, 7)
+    assert res == approx(13)
 
 
-def test_solve_for_n_random():
-    assert random.solve_for_n(4) == approx(-12)
+def test_solve_for_n_random(benchmark):
+    res = benchmark(random.solve_for_n, 4)
+    assert res == approx(-12)
