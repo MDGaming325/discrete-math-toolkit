@@ -1,5 +1,5 @@
-from typing import NamedTuple, Tuple, List
-from src.integer_arith import modular_power, fermat_primality, elegant_eea
+from typing import NamedTuple, List
+from src.integer_arith import mod_exponentiation, fermat_primality, elegant_eea
 from math import gcd
 
 CongruenceEquation = NamedTuple('CongruenceEquation', [(
@@ -7,6 +7,8 @@ CongruenceEquation = NamedTuple('CongruenceEquation', [(
 
 CRTSolution = NamedTuple(
     'CRTSolution', [('coefficient_k', int), ('remainder', int)])
+
+# RSA Cryptography
 
 
 class RSAKey:
@@ -18,6 +20,16 @@ class RSAKey:
         self.totient = (p-1)*(q-1)
 
     def check(self):
+        """
+        The check function is used to verify that the public key is valid.
+            It does this by checking if p and q are prime, and then checks if 
+            the exponent e has a gcd of 1 with phi(n). If all these conditions 
+            are met, it returns True.
+
+        :return: True if the following conditions are met:
+
+        """
+
         if fermat_primality(self.p) and fermat_primality(self.q):
             phi_n = self.totient
             phi_n_prime_with_exp = gcd(phi_n, self.exp)
@@ -28,6 +40,12 @@ class RSAKey:
             return False
 
     def private_key(self):
+        """
+        The private_key function returns the private key of a given public key.
+
+        :return: The private key of the RSAKey object
+        """
+
         return inverse_elegant_eea(self.exp, self.totient)
 
 
@@ -36,14 +54,37 @@ class RSAMessage:
         self.message = message
 
     def encrypt(self, public_key_addressee: RSAKey):
-        return modular_power(self.message,
-                             public_key_addressee.exp,
-                             public_key_addressee.n)
+        """
+        The encrypt function takes a message and encrypts it using the public key of the addressee.
+            The function returns an encrypted message that can only be decrypted by the private key of 
+            the addressee.
 
-    def decrypt(self, public_key_receiver: RSAKey):
-        return modular_power(self.message,
-                             public_key_receiver.private_key(),
-                             public_key_receiver.n)
+        :param public_key_addressee: RSAKey: Specify the public key of the addressee
+        :return: The encrypted message
+
+        """
+
+        return mod_exponentiation(self.message,
+                                  public_key_addressee.exp,
+                                  public_key_addressee.n)
+
+    def decrypt(self, private_key_receiver: int, n_receiver: int):
+        """
+        The decrypt function takes in the private key of the receiver and 
+        the n value of the receiver. It then uses mod_exponentiation to decrypt 
+        the message using these values.
+
+        :param private_key_receiver: int: The private key of the receiver
+        :param n_receiver: int: The n of the receiver
+        :return: The message decrypted, which is the result of mod_exponentiation
+
+        """
+
+        return mod_exponentiation(self.message,
+                                  private_key_receiver,
+                                  n_receiver)
+
+# Inverse
 
 
 def inverse_igneous(n: int, mod: int) -> int:
@@ -88,6 +129,8 @@ def inverse_elegant_eea(a: int, mod: int) -> int:
             raise ValueError("The inverse of a in Zn doesn't exist")
     else:
         raise ValueError('a and n must be positive')
+
+# Chinese Remainder Theorem
 
 
 def normalize_equation(equation: CongruenceEquation) -> CongruenceEquation:

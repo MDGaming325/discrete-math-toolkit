@@ -1,9 +1,6 @@
 import pytest
 from src.modular_arith import *
 
-special_case = [CongruenceEquation(1, 22, 2),
-                CongruenceEquation(1, 7, 3),
-                CongruenceEquation(1, 160, 5)]
 
 # RSA Tests
 
@@ -30,7 +27,8 @@ def test_crypt(benchmark):
 
 
 def test_decrypt(benchmark):
-    res = benchmark(bob_message_encrypted.decrypt, alice)
+    res = benchmark(bob_message_encrypted.decrypt,
+                    alice.private_key(), alice.n)
     assert res == 101010
 
 # Other
@@ -39,6 +37,19 @@ def test_decrypt(benchmark):
 def test_inverse_igneous(benchmark):
     inverse = benchmark(inverse_igneous, 12123, 5)
     assert inverse == 2
+
+
+def test_inverse_elegant_eea(benchmark):
+    res = benchmark(inverse_elegant_eea, 3, 10)
+    assert res == 7
+
+
+# Chinese Remainder Theorem
+
+
+special_case = [CongruenceEquation(1, 22, 2),
+                CongruenceEquation(1, 7, 3),
+                CongruenceEquation(1, 160, 5)]
 
 
 def test_normalize_equation(benchmark):
@@ -50,8 +61,3 @@ def test_CRT_solve_special_case(benchmark):
 
     solution = benchmark(CRT_solve_special_case, special_case)
     assert solution == CRTSolution(30, 10)
-
-
-def test_inverse_elegant_eea(benchmark):
-    res = benchmark(inverse_elegant_eea, 3, 10)
-    assert res == 7
