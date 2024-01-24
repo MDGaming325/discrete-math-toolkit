@@ -1,5 +1,6 @@
 from typing import DefaultDict, NamedTuple, Tuple, List
-from math import sqrt, floor
+from math import sqrt, floor, gcd
+from sympy import sign, factor, symbols
 import random
 
 EuclideanDivision = NamedTuple('EuclideanDivision', [(
@@ -116,26 +117,24 @@ def divp_factorization(n: int) -> List[Tuple[int, int]]:
 
 def fermat_factorization(n: int) -> Tuple[int, int]:
     """
-    The fermat_factorization function takes an integer n as input and returns a tuple of two integers,
-    the first being the smaller factor and the second being the larger factor. The function uses Fermat's 
-    factorization method to find these factors.
-
-    :param n:int: Specify that the function only accepts integers as input
-    :return: A tuple of two integers
+    The fermat_factorization function takes an integer n and returns
+    a tuple of two integers, the first being the factorization of n.
+        Args:
+            n (int): An integer to be factored using Fermat's method.
+    :param n: int: Specify the value of n in the equation x^2 - n = y^2
+    :return: A tuple of prime numbers that multiplied equals n
     """
 
     if n % 2 != 0:
-        S = floor(sqrt(n))
-        l = 1
-        k = 1.1
-
-        while k != int(k):
-            k = sqrt((S+l)**2-n)
+        l = 0
+        candidate = None
+        while candidate == None or (n/(int(candidate)+l)).is_integer() != True:
             l = l + 1
+            candidate = sqrt(n+(l**2))
 
-        return (S+l-k-1, S+l+k-1)
+        return (int(candidate)+l, int(candidate)-l)
     else:
-        raise ValueError('Candidate n must be an even number')
+        raise ValueError('n must be even')
 
 # Primes
 
@@ -173,7 +172,7 @@ def divp_algorithm(n: int) -> int:
     The divp_algorithm function takes a positive integer n as input and returns the smallest prime divisor of n.
         If n is prime, then it returns itself.
 
-        The algorithm works by first checking if 2 or 3 are divisors of the number, since these are the only even primes. 
+        The algorithm works by first checking if 2 or 3 are divisors of the number, since these are the only odd primes. 
         Then it checks all odd numbers up to sqrt(n) for primality using modular arithmetic.
 
     :param n: int: Specify that the function takes an integer as input
@@ -260,3 +259,67 @@ def elegant_eea(a: int, b: int) -> EuclideanExtended:
         old_t, t = t, old_t - c*t
 
     return EuclideanExtended(old_r, old_s, old_t)
+
+# Diophantine Equations
+
+
+class Diophantine:
+
+    def __init__(self, a: int, b: int, c: int) -> None:
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = gcd(self.a, self.b)
+        self.new_a = self.a//self.d
+        self.new_b = self.b//self.d
+        self.new_c = self.c//self.d
+
+    def check(self):
+        if self.c % self.d == 0:
+            return True
+        else:
+            return False
+
+    def particular_solution(self):
+
+        if self.check():
+
+            bezout = elegant_eea(abs(self.new_a), abs(self.new_b))
+
+            return (sign(self.new_a)*bezout.alpha*self.new_c,
+                    sign(self.new_b)*bezout.beta*self.new_c)
+        else:
+            return ValueError('Diophantine Equation has no solution')
+
+    def general_solution(self):
+
+        particular = self.particular_solution()
+
+        k = symbols('k')
+        sy_a = symbols('sy_a')  # Symbol associated with new_a
+        sy_b = symbols('sy_b')  # Symbol associated with new_b
+
+        sign_a = int(sign(self.new_a))
+        sign_b = int(sign(self.new_b))
+
+        if sign_b < 0:  # Improve
+            sub = -1
+        else:
+            sub = 1
+
+        add_and_subtract = sy_a * sy_b * k
+
+        expr_x = (particular[0] + add_and_subtract)
+        expr_y = (particular[1] - add_and_subtract)
+
+        expr_x = factor(expr_x, sign_a*sy_a).subs(sy_a, sub)
+        expr_y = factor(expr_y, sign_b*sy_b).subs(sy_b, sub)
+
+        expr_x = expr_x.subs(sy_b, self.new_b)
+        expr_y = expr_y.subs(sy_a, self.new_a)
+
+        return (expr_x, expr_y)
+
+    def restrictions(self):
+        # TODO
+        pass
