@@ -1,13 +1,52 @@
 from typing import NamedTuple, Tuple, List
+from src.integer_arith import modular_power, fermat_primality, elegant_eea
 from math import gcd
 
 CongruenceEquation = NamedTuple('CongruenceEquation', [(
     'coefficient_x', int), ('remainder', int), ('mod', int)])
+
 CRTSolution = NamedTuple(
     'CRTSolution', [('coefficient_k', int), ('remainder', int)])
 
 
-def inverse_igneous(n: int, m: int) -> int:
+class RSAKey:
+    def __init__(self, p: int, q: int, exp: int) -> None:
+        self.p = p
+        self.q = q
+        self.n = self.p*self.q
+        self.exp = exp
+        self.totient = (p-1)*(q-1)
+
+    def check(self):
+        if fermat_primality(self.p) and fermat_primality(self.q):
+            phi_n = self.totient
+            phi_n_prime_with_exp = gcd(phi_n, self.exp)
+
+            if phi_n_prime_with_exp:
+                return True
+        else:
+            return False
+
+    def private_key(self):
+        return inverse_elegant_eea(self.exp, self.totient)
+
+
+class RSAMessage:
+    def __init__(self, message: int) -> None:
+        self.message = message
+
+    def encrypt(self, public_key_addressee: RSAKey):
+        return modular_power(self.message,
+                             public_key_addressee.exp,
+                             public_key_addressee.n)
+
+    def decrypt(self, public_key_receiver: RSAKey):
+        return modular_power(self.message,
+                             public_key_receiver.private_key(),
+                             public_key_receiver.n)
+
+
+def inverse_igneous(n: int, mod: int) -> int:
     """
     The inverse_igneous function takes two integers, n and m, as input. It then returns the inverse of n module m.
         The function works by iterating through all possible values of x until it finds a value that satisfies the equation:
@@ -24,10 +63,31 @@ def inverse_igneous(n: int, m: int) -> int:
     x = 0
 
     while remainder != 1:
-        remainder = (n*x) % m
+        remainder = (n*x) % mod
         x = x+1
 
     return x-1
+
+
+def inverse_elegant_eea(a: int, mod: int) -> int:
+    """
+    The inverse_elegant_eea function takes two integers a and n as input,
+    and returns the inverse of a in Zn. If the inverse doesn't exist, it raises an error.
+
+    :param a: int: The number that we search it's inverse
+    :param n: int: Specify the modulus of the group Zn
+    :return: The inverse of a in zn
+
+    """
+
+    if a > 0 and mod > 0:
+        aee = elegant_eea(a, mod)
+        if aee.d == 1:
+            return aee.alpha % mod
+        else:
+            raise ValueError("The inverse of a in Zn doesn't exist")
+    else:
+        raise ValueError('a and n must be positive')
 
 
 def normalize_equation(equation: CongruenceEquation) -> CongruenceEquation:
